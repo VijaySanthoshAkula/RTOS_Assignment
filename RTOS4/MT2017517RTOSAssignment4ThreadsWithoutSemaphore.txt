@@ -1,0 +1,105 @@
+#include <unistd.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <stdio.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+int a; /* A global variable*/
+int b; /* A global variable*/
+int c; /* A global variable*/
+
+void * Thread1Proc(){
+	int i,j,k;
+	i=20;
+	j=21;
+	k=22;
+	printf("Local Address t1 is %x\n ", &i);
+	printf("Local Address t1 is %x\n ", &j);
+	printf("Local Address t1 is %x\n ", &k);
+	printf("global Address t1 is %x \n", &a);
+	printf("global Address t1 is%x \n", &b);
+	printf("global Address t1 is%x\n ", &c);
+	a=5;
+	b=6;
+	c=7;
+	while(1){
+		printf("global value t1 is %d \n", a);
+		printf("global value t1 is %d \n", b);
+		printf("global value t1 is %d\n ", c);
+		printf("local value t1 is %d\n ", i);
+		printf("local value t1 is %d\n ", j);
+		printf("local value t1 is %d\n ", k);
+	}
+}
+
+void * Thread2Proc(){
+	int i,j,k;
+	i=23;
+	j=24;
+	k=25;
+	printf("Local Address t1 is %x\n ", &i);
+	printf("Local Address t1 is %x\n ", &j);
+	printf("Local Address t1 is %x\n ", &k);
+	printf("global Address t2 is %x \n", &a);
+	printf("global Address t2 is %x \n", &b);
+	printf("global Address t2 is %x\n ", &c);
+	a=8;
+	b=9;
+	c=10;
+	while(1){
+		printf("global value t2 is %d \n", a);
+		printf("global value t2 is %d \n", b);
+		printf("global value t2 is %d\n ", c);
+		printf("local value t1 is %d\n ", i);
+		printf("local value t1 is %d\n ", j);
+		printf("local value t1 is %d\n ", k);
+	}
+}
+
+
+
+void * Thread3Proc(){
+	int i,j,k;
+	i=26;
+	j=27;
+	k=28;
+	printf("Local Address t1 is %x\n ", &i);
+	printf("Local Address t1 is %x\n ", &j);
+	printf("Local Address t1 is %x\n ", &k);
+	printf("global Address t3 is %x \n", &a);
+	printf("global Address t3 is %x \n", &b);
+	printf("global Address t3 is %x\n ", &c);
+	a=11;
+	b=12;
+	c=13;
+	while(1){
+		printf("global value t3 is %d \n", a);
+		printf("global value t3 is %d \n", b);
+		printf("global value t3 is %d\n ", c);
+		printf("local value t1 is %d\n ", i);
+		printf("local value t1 is %d\n ", j);
+		printf("local value t1 is %d\n ", k);
+	}
+}
+
+int main(void)
+{
+	a=1;
+	b=2;
+	c=3;
+	printf("global value main is %d \n", a);
+	printf("global value main is %d \n", b);
+	printf("global value main is %d\n ", c);
+	printf("global Address main is %x \n", &a);
+	printf("global Address main is %x\n ", &b);
+	printf("global Address main is %x \n", &c);
+
+	pthread_t t1, t2, t3;
+	pthread_create(&t1,NULL,Thread1Proc,NULL);
+	pthread_create(&t2,NULL,Thread2Proc,NULL);
+	pthread_create(&t3,NULL,Thread3Proc,NULL);
+	printf("Pthread value = %d\n", t1);
+	printf("Pthread value = %d\n", t2);
+	printf("Pthread value = %d\n", t3);
+
+}
