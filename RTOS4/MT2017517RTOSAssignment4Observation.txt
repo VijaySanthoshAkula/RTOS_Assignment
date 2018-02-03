@@ -1,0 +1,32 @@
+1.Threads without SemaPhore:
+
+  Observation:
+  1. Address values of global variables printed by each of ThreadxProc() is constant  
+  2. Address values of local variables printed by each of ThreadxProc() is different
+  3. values of local variables printed by each of ThreadxProc() depends on the values assigned in method itself
+  4. values of global variables printed by each of ThreadxProc() many of the times doesnt have correlation with what are defined inside the method itself.
+  5. Order of execution(print statements) is random between threads.
+ 
+  Reason:
+  1. Since these are global variables they are shared between all the threads so have unique constant address independent of threads.
+  2. Threads have their own copy of local variables of address of local variables between threads is different
+  3. Since local variables are unique there values are also unique
+  4. Since we are changing the global variables in each every Threadxproc() and since threads run concurrently the values printed by
+     by the methods will be values which are set at that time by different threads.
+  5. threads context switching time is low and threads run concurrently and therefore order of execution depends on scheduling number of processors etc.
+
+2.Threads with SemaPhore:
+
+  Observation:
+  1. Address values of global variables printed by each of ThreadxProc() is constant  
+  2. Address values of local variables printed by each of ThreadxProc() is different
+  3. values of local variables printed by each of ThreadxProc() depends on the values assigned in method itself
+  4. values of global variables printed by each of ThreadxProc() have correlation with what are defined inside the method itself.
+  5. Order of execution(print statements) is random between threads.
+ 
+  Reason:
+  1. Since these are global variables they are shared between all the threads so have unique constant address independent of threads.
+  2. Threads have their own copy of local variables of address of local variables between threads is different
+  3. Since local variables are unique there values are also unique
+  4. Since we are using semaphore lock to change  the global variables in each every Threadxproc(),  we can hinder at a time access of global variables which increases predictability.
+  5. threads context switching time is low and threads run concurrently and therefore order of execution depends on scheduling number of processors etc.
