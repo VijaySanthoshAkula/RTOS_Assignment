@@ -1,0 +1,98 @@
+#include <unistd.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <stdio.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+int var_glb; /* A global variable*/
+int var_glb2; /* A global variable*/
+int var_glb3; /* A global variable*/
+
+void printVariable(){
+	int i,j,k;
+	printf("Local Address is %x\n ", &i);
+	printf("Local Address is %x\n ", &j);
+	printf("Local Address is %x\n ", &k);
+	printf("global Address is %x \n", &var_glb);
+	printf("global Address is %x \n", &var_glb2);
+	printf("global Address is %x\n ", &var_glb3);
+}
+
+int main(void)
+{
+	int a,b,c;
+	FILE *fptr;
+	fptr = fopen("destroy2.sh", "w");//
+	if (fptr == NULL)
+	{
+		printf("File does not exists \n");
+		return;
+	}
+	fprintf(fptr, "#!/bin/bash\n");
+
+	printf("Local Address is %x \n", &a);
+	printf("Local Address is %x\n ", &b);
+	printf("Local Address is %x \n", &c);
+	printf("global Address is %x \n", &var_glb);
+	printf("global Address is %x \n", &var_glb2);
+	printf("global Address is %x \n", &var_glb3);
+
+	pid_t childPID1,childPID2,childPID3;
+	printf("parent pid is %d \n", getpid());
+	fprintf(fptr, "kill  %d\n",  getpid());
+	childPID1 = fork();
+
+	if(childPID1 >= 0) // fork was successful
+	{
+		if(childPID1 == 0) // child process
+		{
+			;
+			printf("1dytdt");
+			printVariable();
+			while(1);
+		}
+		else //Parent process
+		{
+			printf("child pid is %d \n", childPID1);
+			fprintf(fptr, "kill  %d\n",  childPID1);
+			childPID2=fork();
+
+			if(childPID2>=0){
+				if(childPID2==0){
+					printf("2dytdt");
+					printVariable();
+					while(1);
+				}else{
+					printf("child pid is %d \n", childPID2);
+					fprintf(fptr, "kill  %d\n",  childPID2);
+					childPID3=fork();
+
+					if(childPID3>=0){
+						if(childPID3==0){
+							printf("3dytdt");
+							printVariable();
+							while(1);
+						}else{
+							printf("child pid is %d \n", childPID3);
+							fprintf(fptr, "kill  %d\n",  childPID3);
+							fprintf(fptr, "exit() \n");
+							fclose(fptr);
+							while(1);
+						}
+					}else{
+						printf("\n Fork3 failed, quitting!!!!!!\n");
+					}
+				}
+			}else{
+				printf("\n Fork 2 failed, quitting!!!!!!\n");
+				return 1;
+			}
+		}
+	}
+	else // fork failed
+	{
+		printf("\n Fork 1 failed, quitting!!!!!!\n");
+		return 1;
+	}
+	return 0;
+}
