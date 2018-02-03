@@ -1,0 +1,46 @@
+void setup() {
+	// initialize digital pin LED_BUILTIN as an output.
+	pinMode(6, OUTPUT);
+	pinMode(7, OUTPUT);
+	pinMode(8, OUTPUT);
+	pinMode(9, OUTPUT);
+	pinMode(11, OUTPUT);//control signal
+}
+int binaryNum[4];
+void decToBinary(int n)
+{
+	// array to store binary number
+
+
+	// counter for binary array
+	int i = 0;
+	while (n > 0) {
+
+		// storing remainder in binary array
+		binaryNum[i] = n % 2;
+		n = n / 2;
+		i++;
+	}
+}
+int o=1;
+
+void loop() {
+	digitalWrite(11,1);
+	decToBinary(o);
+	digitalWrite(6, binaryNum[0]);  
+	digitalWrite(7, binaryNum[1]);    
+	digitalWrite(8, binaryNum[2]); 
+	digitalWrite(9, binaryNum[3]);
+
+	delay(2000); 
+	if(o==15){
+		o=1;
+		binaryNum[0]=0;
+		binaryNum[1]=0;
+		binaryNum[2]=0;
+		binaryNum[3]=0;
+	}else{
+		o++;
+	};
+	digitalWrite(11,0);
+}
