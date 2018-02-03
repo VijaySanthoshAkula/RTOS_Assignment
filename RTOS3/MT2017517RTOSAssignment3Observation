@@ -1,0 +1,39 @@
+OutPut:
+
+Local Address is d5d97388 
+Local Address is d5d9738c
+Local Address is d5d97390 
+global Address is 601080 
+global Address is 60107c 
+global Address is 601084 
+parent pid is 2206 
+child pid is 2207 
+Local Address is in methodd5d9735c
+Local Address is in methodd5d97360
+Local Address is in methodd5d97364
+global Address is in method601080 
+global Address is in method60107c 
+global Address is in method601084
+child pid is 2208 
+Local Address is in methodd5d9735c
+Local Address is in methodd5d97360
+Local Address is in methodd5d97364
+global Address is in method601080 
+global Address is in method60107c 
+global Address is in method601084
+child pid is 2209 
+Local Address is in methodd5d9735c
+Local Address is in methodd5d97360
+Local Address is in methodd5d97364
+global Address is in method601080 
+global Address is in method60107c 
+global Address is in method601084
+
+
+Observation:
+
+1. variables with same names are defined with same virtual address here.
+
+Reason:
+
+1. Each process gets its own address space.the memory management unit that will map virtual addresses to physical ones 
