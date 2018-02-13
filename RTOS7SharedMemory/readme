@@ -1,1 +1,2 @@
 
+Integer which has to be written to shared memory has to be passed as argument to sharedmemory.c file
