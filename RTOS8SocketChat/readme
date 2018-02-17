@@ -1,1 +1,3 @@
 
+Client or server chat should be terminated by typing "bye" during chat.
+ctrl+z pr ctrl+c should not be used.
