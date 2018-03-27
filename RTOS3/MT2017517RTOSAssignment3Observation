@@ -32,8 +32,14 @@ global Address is in method601084
 
 Observation:
 
-1. variables with same names are defined with same virtual address here.
+1. Global Address is same, whether we print it in Parent or in child . Global Variables are stored in Data segment.
+2. Local Address a,b,c defined in parent have different address, local variables are stored in stack.
+3. When we print the address of local variables(i,j,k)(which are defined in the function printVariable) from three child process, 
+   it appears as address(5d9735c ) of i when printed from child1,child2,child3 is same But the address which we see here is virtual address
+   So Memory management unit assigns different offsets for different childs so finally the Actual address of "i" is sum of offset of that child and virtual address.
+4. Above discussion(point 2) also applies to local variables (j,k) of printvariables function.
+5. After a fork is executed to create a child an exact copy of address space is done. so virtual address might be same but offset will differ.
 
-Reason:
+Shell script of deleting all the child and parent which entered into infinte loop:
 
-1. Each process gets its own address space.the memory management unit that will map virtual addresses to physical ones 
+1. Once the child is created through fork we will get the Pid of the child now that Pid is passed to .sh file, this process is repeated for each and every child and parent.
