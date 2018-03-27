@@ -1,4 +1,8 @@
-
+1. For Message Queues
 1. Supply numbers and the arithmetic which has to be performed as follows
 number1 space operator space number2 ex:(2 + 3). to the clientinput.txt files.
 2. Pass clientinput.txt file as arguement to client1 executable file
+
+2. for pipes
+1.Please ensure there are some .txt files in the directory , otherwise we will be displayed with a zero as output
+
