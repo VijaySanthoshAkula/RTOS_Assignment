@@ -193,7 +193,7 @@ int main()
 		return 0;
 	}
 
-	/* Specifying port and address of server */
+	
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(PORT);
