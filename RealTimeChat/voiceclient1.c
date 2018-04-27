@@ -80,7 +80,7 @@ int main(int argc, char const *argv[])
     int16_t Msg[BUFSIZE];
     int bufsize = BUFSIZE * sizeof(int16_t);
     int16_t buffer[BUFSIZE];
-    if ((sckt = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    if ((sckt = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
         printf("\n Not able to create socket \n");
         return -1;
@@ -89,20 +89,21 @@ int main(int argc, char const *argv[])
     memset(&serv_addr, '0', sizeof(serv_addr));
   
     serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");;
     serv_addr.sin_port = htons(PORT);
-    serv_addr.sin_addr.s_addr=inet_addr("172.16.83.132");
+      
     
-    if(inet_pton(AF_INET, "172.16.83.132", &serv_addr.sin_addr)<=0) 
+    /*if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0) 
     {
         printf("\nInvalid address/ Address is not supported \n");
         return -1;
-    }
+    }*/
     //connect
-    if (connect(sckt, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+  /*  if (connect(sckt, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
         printf("\nConnection Failed \n");
         return -1;
-    }
+    }*/
     
     
         int i=0;
@@ -110,24 +111,26 @@ ssize_t r;
 
     
     printf("enter the string to be send to server\n");
+
     while(r!=50000){
     adin_pulseaudio_begin("nothing");
 	adin_pulseaudio_read(Msg, BUFSIZE);
-	usleep(5);
+	//usleep(5);
        
     /*if (write(STDOUT_FILENO, Msg, BUFSIZE) != BUFSIZE) {
             fprintf(stderr, __FILE__": write() failed: %s\n", strerror(errno));
             goto finish;
         }*/
     
-   r=write(sckt , Msg , bufsize , 0 );
+   r=sendto(sckt , Msg , bufsize ,0, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
   
    // printf("message sent from client\n");
  printf("number of bytes sent %d",r);
     //valread = read( sckt , buffer, bufsize);
- adin_pulseaudio_end();
-    
+ 
+    adin_pulseaudio_end();
  }   
+
 close(sckt);
 finish:
 	adin_pulseaudio_end();
