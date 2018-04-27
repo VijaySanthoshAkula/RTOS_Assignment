@@ -1,4 +1,4 @@
-/*program has to be terminated by typing "bye" only*/
+/*program has to be terminated using "bye" statement only*/
 #include <stdio.h>
 #include <sys/socket.h>
 #include <stdlib.h>
@@ -7,27 +7,15 @@
 #include <errno.h>
 #include <string.h>
 #include <stddef.h>
-
 #include <pulse/simple.h>
 #include <pulse/error.h>
+#include<arpa/inet.h>
 #define PORT 6542
 #define BUFSIZE 21500
 #define RATE 44100
 static pa_simple *s = NULL;
 static char name_buf[] = "PulseAudio default device";
-int adin_pulseaudio_standby(int sfreq, void *dummy)
-{
-  return 0;
-}
- 
-/** 
- * Start recording.
- * @a pathname is dummy.
- *
- * @param arg [in] argument
- * 
- * @return TRUE on success, FALSE on failure.
- */
+
 int adin_pulseaudio_begin(char *arg)
 {
   int error;
@@ -37,11 +25,11 @@ int adin_pulseaudio_begin(char *arg)
   	.rate = RATE,
   	.channels = 1
   };
-  
-  if (!(s = pa_simple_new(NULL, "Julius", PA_STREAM_RECORD, NULL, "record", &ss, NULL, NULL, &error))) {
-    printf("Error: adin_pulseaudio: pa_simple_new() failed: %s\n", pa_strerror(error));
-    return 1;
-  }
+
+if (!(s = pa_simple_new(NULL, "Julius", PA_STREAM_PLAYBACK, NULL, "playback", &ss, NULL, NULL, &error))) {
+        fprintf(stderr, __FILE__": pa_simple_new() failed: %s\n", pa_strerror(error));
+        return 1;
+    }
   return 0;
 }
 
@@ -54,84 +42,73 @@ int adin_pulseaudio_end()
   return 0;
 }
 
-int adin_pulseaudio_read (int16_t *buf, int sampnum)
-{
-  int error;
-  int cnt, bufsize;
-  
-
-  bufsize = sampnum * sizeof(int16_t);
-  if (bufsize > BUFSIZE) bufsize = BUFSIZE;
-
-  if (pa_simple_read(s, buf, bufsize, &error) < 0) {
-        printf("Error: pa_simple_read() failed: %s\n", pa_strerror(error));
-  }
-  cnt = bufsize / sizeof(int16_t);
-  return (cnt);
-}
-
-
-
 int main(int argc, char const *argv[])
 {
+    int srvr, new_socket, valread;
     struct sockaddr_in address;
-    int sckt = 0, valread;
-    struct sockaddr_in serv_addr;
-    int16_t Msg[BUFSIZE];
-    int bufsize = BUFSIZE * sizeof(int16_t);
+    int opt = 1;
+    int addrlen = sizeof(address);
     int16_t buffer[BUFSIZE];
-    if ((sckt = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    int16_t Msg[BUFSIZE] ;
+      int bufsize = BUFSIZE * sizeof(int16_t);
+    // Creating socket file descriptor
+    if ((srvr = socket(AF_INET, SOCK_DGRAM, 0)) == 0)
     {
-        printf("\n Not able to create socket \n");
-        return -1;
+        perror("socket failed");
+        exit(EXIT_FAILURE);
     }
-  
-    memset(&serv_addr, '0', sizeof(serv_addr));
-  
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
-      
-    
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0) 
-    {
-        printf("\nInvalid address/ Address is not supported \n");
-        return -1;
-    }
-    //connect
-    if (connect(sckt, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    {
-        printf("\nConnection Failed \n");
-        return -1;
-    }
-    
-    
-        int i=0;
-ssize_t r;
-
-    
-    printf("enter the string to be send to server\n");
-    while(r!=50000){
-    adin_pulseaudio_begin("nothing");
-	adin_pulseaudio_read(Msg, BUFSIZE);
-	usleep(5);
        
-    /*if (write(STDOUT_FILENO, Msg, BUFSIZE) != BUFSIZE) {
+    /*if (setsockopt(srvr, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,
+                                                  &opt, sizeof(opt)))
+    {
+        perror("setsockopt");
+        exit(EXIT_FAILURE);
+    }*/
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons( PORT );
+      
+    // binding
+    if (bind(srvr, (struct sockaddr *)&address, 
+                                 sizeof(address))<0)
+    {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
+   
+    //chat begins
+   ssize_t r;
+    int error;
+   
+while(r!=50000){
+printf("Waiting for data...");
+adin_pulseaudio_begin("nothing");
+ 
+   r = recvfrom( srvr , buffer, bufsize,0,(struct sockaddr *)&address, 
+                       &addrlen) ;
+            
+   /*  if (write(STDOUT_FILENO, buffer, BUFSIZE/2) != BUFSIZE/2) {
             fprintf(stderr, __FILE__": write() failed: %s\n", strerror(errno));
             goto finish;
         }*/
-    
-   r=write(sckt , Msg , bufsize , 0 );
-  
-   // printf("message sent from client\n");
- printf("number of bytes sent %d",r);
-    //valread = read( sckt , buffer, bufsize);
- adin_pulseaudio_end();
-    
- }   
-close(sckt);
-finish:
-	adin_pulseaudio_end();
+    if (pa_simple_write(s, buffer, bufsize, &error) < 0) {
+            fprintf(stderr, __FILE__": pa_simple_write() failed: %s\n", pa_strerror(error));
+            goto finish;
+        }
+   // printf("message received from client\n");
+    printf("number of bytes received %d\n",r);
+adin_pulseaudio_end();
+ 
+  /*  if (pa_simple_drain(s, &error) < 0) {
+        fprintf(stderr, __FILE__": pa_simple_drain() failed: %s\n", pa_strerror(error));
+        goto finish;
+    }
+
+*/}
+
+    close(srvr);
+    finish:
+    adin_pulseaudio_end();
 
 	return 0;
-    
 }
