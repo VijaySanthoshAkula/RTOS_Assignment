@@ -1,4 +1,4 @@
-/*Real time chat client*/
+/*Real time audio client*/
 #include <stdio.h>
 #include <sys/socket.h>
 #include <stdlib.h>
